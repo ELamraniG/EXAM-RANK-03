@@ -1,67 +1,50 @@
+//Allowed functions: puts, malloc, calloc, realloc, free, write
+#include <stdio.h>
 #include <unistd.h>
 
-void sort_str(char *str)
+void swap(char *c, char *b)
 {
-    int i, j;
-    char temp;
-
-    i = 0;
-    while (str[i])
-    {
-        j = i + 1;
-        while (str[j])
-        {
-            if (str[i] > str[j])
-            {
-                temp = str[i];
-                str[i] = str[j];
-                str[j] = temp;
-            }
-            j++;
-        }
-        i++;
-    }
-}
-#include <stdio.h>
-
-
- int ft_strlen(char *str)
- {
-    int i = 0;
-    if(!str)
-        return 0;
-    while (str[i])
-        i++;
-    return i;}
-void permutation(char *str,int index, int size)
-{
-    if (index == size)
-        printf("%s\n",str);
-    int i = index;
-    while (i < size)
-    {
-        char c = str[i];
-        str[i] = str[index];
-        str[index] = c;
-        permutation(str,index + 1, size);
-         c = str[i];
-        str[i] = str[index];
-        str[index] = c;
-        i++;
-    }
+	char tmp = *c;
+	*c = *b;
+	*b = tmp;
 }
 
-
-int main(int ac, char **av)
+void ft_sort(char *str)
 {
-    if (ac != 2)
-    {
-        write(1, "\n", 1);
-        return 0;
-    }
-    char *str = av[1];
-    int size = ft_strlen(str);
-    sort_str(str);
-    permutation(str, 0, size);
+	int i = 0;
+	int j = 0;
+	while(str[i])
+	{
+		j = i + 1;
+		while (str[j])
+		{
+			if (str[i] > str[j])
+				swap(str + j, str + i);
+			j++;
+		}
+		i++;
+	}
 }
 
+void ft_permutations(char *str, int pos,int size)
+{
+	if (pos == size)
+		puts(str);
+	for (int i = pos; i < size; i++)
+	{
+		ft_sort(str + pos);
+		swap(str + i, str + pos);
+		ft_permutations(str,pos + 1, size);
+		swap(str + i, str + pos);
+	}
+}
+
+int main(int ac,char **av)
+{
+	if (ac != 2 || !av[1][0])
+		return (0);
+	int size= 0;
+	while (av[1][size])
+		size++;
+	ft_permutations(av[1], 0,size);
+}
