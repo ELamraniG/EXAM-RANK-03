@@ -26,15 +26,15 @@ void ft_sort(char *str)
 	}
 }
 
-void ft_permutations(char *str, int pos,int size)
+void ft_permutations(char *str, int pos)
 {
-	if (pos == size)
+	if (!str[pos])
 		puts(str);
-	for (int i = pos; i < size; i++)
+	for (int i = pos; i < str[i]; i++)
 	{
 		ft_sort(str + pos);
 		swap(str + i, str + pos);
-		ft_permutations(str,pos + 1, size);
+		ft_permutations(str,pos + 1);
 		swap(str + i, str + pos);
 	}
 }
@@ -43,8 +43,5 @@ int main(int ac,char **av)
 {
 	if (ac != 2 || !av[1][0])
 		return (0);
-	int size= 0;
-	while (av[1][size])
-		size++;
-	ft_permutations(av[1], 0,size);
+	ft_permutations(av[1], 0);
 }
