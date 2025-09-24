@@ -1,84 +1,89 @@
-#include <stdio.h>
-#include <string.h>
 #include <unistd.h>
-// don't forget to print space instead of _ ana i used _ for clarity wsalam
+#include <stdio.h>
 
-int	is_valid(char *str)
+int calculate_length(char *string)
 {
-	int	i;
-	int	res;
-
-	i = 0;
-	res = 0;
-	while (str[i])
-	{
-		if (str[i] == '(')
-			res++;
-		if (str[i] == ')')
-			res--;
-		if (res < 0)
-			return (0);
-		i++;
-	}
-	if (res == 0)
-		return (1);
-	return (0);
+    int counter = 0;
+    while (string[counter])
+        counter++;
+    return counter;
 }
 
-void	calc_min(char *str, int *min, int index, int change)
+int check_validity(char *string)
 {
-	int		i;
-	char	c;
-  if (change > *min)
-      return ;
-		if (is_valid(str) && change < *min)
-		{
-			*min = change;
-		}
-	i = index;
-	while (str[i])
-	{
-		c = str[i];
-		str[i] = '_';
-		change++;
-		calc_min(str, min, i + 1, change);
-		str[i] = c;
-		change--;
-		i++;
-	}
+    int balance = 0; 
+    int index = 0;
+    while (string[index])
+    {
+        if (string[index] == '(')
+            balance++;
+        else if (string[index] == ')')
+        {
+            balance--;
+            if (balance < 0)
+                return 0;
+        }
+        index++;
+    }
+    return (balance == 0);
 }
 
-
-
-void	rip(char *str, int min, int index, int change)
+void generate_combinations(char *text, int position, int excess_open, int excess_close)
 {
-	int		i;
-	char	c;
-  if (change > min)
-      return ;
-		if (is_valid(str) && change == min)
-			puts(str);
-	i = index;
-	while (str[i])
-	{
-		c = str[i];
-		str[i] = '_';
-		change++;
-		rip(str, min, i + 1, change);
-		str[i] = c;
-		change--;
-		i++;
-	}
+    if (excess_open == 0 && excess_close == 0)
+    {
+        if (check_validity(text))
+            puts(text);
+        return;
+    }
+
+    int current = position;
+    while (text[current])
+    {
+        if (text[current] == '(' && excess_open > 0)
+        {
+            text[current] = ' ';
+            generate_combinations(text, current + 1, excess_open - 1, excess_close);
+            text[current] = '(';
+        } 
+        else if (text[current] == ')' && excess_close > 0)
+        {
+            text[current] = ' ';
+            generate_combinations(text, current + 1, excess_open, excess_close - 1);
+            text[current] = ')';
+        }
+        current++;
+    }
 }
 
-int	main(int ac, char **av)
+int main (int argc, char *argv[])
 {
-	if (ac != 2 || av[1][0] == 0)
-	{
-		write (1,"\n",1);
-		return (1);
-	}
-	int min = strlen(av[1]);
-	calc_min(av[1], &min, 0, 0);
-	rip(av[1], min, 0, 0);
+    if (argc != 2)
+        return 1;
+    int length = calculate_length(argv[1]);
+    int unmatched_open = 0, unmatched_close = 0;
+    char buffer[length + 1];
+    int idx = 0;
+    while (idx < length)
+    {
+        buffer[idx] = argv[1][idx];
+        idx++;
+    }
+    buffer[length] = '\0';
+
+    idx = 0;
+    while (idx < length)
+    {
+        if (buffer[idx] == '(')
+            unmatched_open++;
+        else if (buffer[idx] == ')')
+        {
+            if (unmatched_open > 0)
+                unmatched_open--;
+            else 
+                unmatched_close++;
+        }
+        idx++;
+    }
+    generate_combinations(buffer, 0, unmatched_open, unmatched_close);
 }
